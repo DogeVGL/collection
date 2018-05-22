@@ -4,6 +4,7 @@ import org.glavo.collection.AbstractIterator;
 import org.glavo.collection.Iterator;
 
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 public final class CollectionUtils {
     private CollectionUtils() {
@@ -21,4 +22,6 @@ public final class CollectionUtils {
             return false;
         }
     };
+
+    public static final Predicate<Object> ALWAYS_TRUE = it -> true;
 }

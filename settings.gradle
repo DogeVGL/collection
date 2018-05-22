@@ -1,2 +1,3 @@
-rootProject.name = 'collection'
+rootProject.name = 'glavo-collection'
 
+include 'collection'

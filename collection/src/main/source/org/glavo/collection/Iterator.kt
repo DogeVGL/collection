@@ -23,6 +23,41 @@ interface Iterator<out T> : Traversable<T> {
     fun nextValueOrNull(): Value<T>? = if (hasNext()) Value(next()) else null
 
     @JvmDefault
+    override fun elementAt(index: Int): T {
+        var idx = 0
+        forEachRemaining {
+            if (idx == index)
+                return it
+            idx++
+        }
+        throw NoSuchElementException()
+    }
+
+    @JvmDefault
+    override fun elementAtOrNull(index: Int): T? {
+        var idx = 0
+        forEachRemaining {
+            if (idx == index) {
+                return it
+            }
+            idx++
+        }
+        return null
+    }
+
+    @JvmDefault
+    override fun elementValueAtOrNull(index: Int): Value<T>? {
+        var idx = 0
+        forEachRemaining {
+            if (idx == index) {
+                return Value(it)
+            }
+            idx++
+        }
+        return null
+    }
+
+    @JvmDefault
     override fun size(): Int {
         var count = 0
         forEachRemaining { count++ }

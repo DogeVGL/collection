@@ -2,6 +2,7 @@
 
 package org.glavo.collection.mutable
 
+import org.glavo.collection.Seq
 import org.glavo.collection.Traversable
 import java.util.function.IntFunction
 import kotlin.reflect.KClass
@@ -114,6 +115,8 @@ constructor(private val arrayConstructor: IntFunction<out Array<T>>, initialCapa
     }
 
     override fun build(): Array<T> = toArray(arrayConstructor)
+
+    override fun newTBuilder(): Builder<T, ArrayBuilder<T>> = GrowableBuilder(ArrayBuilder(arrayConstructor, DEFAULT_CAPACITY))
 
     override fun className(): String = "ArrayBuilder"
 }

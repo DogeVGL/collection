@@ -2,13 +2,13 @@
 
 package org.glavo.collection.internal
 
-import org.glavo.collection.AbstractIterator
-import org.glavo.collection.function.IndexedFunction
-import org.glavo.collection.Iterator
+import org.glavo.collection.*
+import org.glavo.collection.function.*
+
 import java.util.function.Predicate
 
-interface IteratorView<T> : Iterator<T> {
-    class Filtered<T>(private val iterator: org.glavo.collection.Iterator<T>, private val predicate: Predicate<in T>) : IteratorView<T> {
+interface IteratorView<T> : Iterator<T>, View<T> {
+    class Filtered<T>(private val iterator: Iterator<T>, private val predicate: Predicate<in T>) : AbstractIterator<T>(), IteratorView<T> {
 
         private var head: T? = null
         private var headIsDefined = false
@@ -37,7 +37,7 @@ interface IteratorView<T> : Iterator<T> {
         }
     }
 
-    class MappedIndexed<T, U>(private val iterator: org.glavo.collection.Iterator<T>, private val mapper: IndexedFunction<in T, out U>) : AbstractIterator<U>(), IteratorView<U> {
+    class MappedIndexed<T, U>(private val iterator: Iterator<T>, private val mapper: IndexedFunction<in T, out U>) : AbstractIterator<U>(), IteratorView<U> {
 
         private var index = 0
 
@@ -50,7 +50,7 @@ interface IteratorView<T> : Iterator<T> {
         }
     }
 
-    class Mapped<T, U>(private val iterator: org.glavo.collection.Iterator<T>, private val mapper: Function1<T, U>) : AbstractIterator<U>(), IteratorView<U> {
+    class Mapped<T, U>(private val iterator: Iterator<T>, private val mapper: Function1<T, U>) : AbstractIterator<U>(), IteratorView<U> {
 
         override fun hasNext(): Boolean {
             return iterator.hasNext()
@@ -61,7 +61,7 @@ interface IteratorView<T> : Iterator<T> {
         }
     }
 
-    class Concat<T>(private val iterators: org.glavo.collection.Iterator<org.glavo.collection.Iterator<T>>) : AbstractIterator<T>(), IteratorView<T> {
+    class Concat<T>(private val iterators: Iterator<org.glavo.collection.Iterator<T>>) : AbstractIterator<T>(), IteratorView<T> {
         private var theIterator: org.glavo.collection.Iterator<T>? = null
 
         override fun hasNext(): Boolean {
@@ -104,7 +104,7 @@ interface IteratorView<T> : Iterator<T> {
         }
     }
 
-    class Take<T>(private val iterator: org.glavo.collection.Iterator<T>, private val n: Int) : AbstractIterator<T>(), IteratorView<T> {
+    class Take<T>(private val iterator: Iterator<T>, private val n: Int) : AbstractIterator<T>(), IteratorView<T> {
 
         private var count = 0
 
@@ -121,7 +121,20 @@ interface IteratorView<T> : Iterator<T> {
         }
     }
 
-    class Zip<T, U>(private val iterator1: org.glavo.collection.Iterator<T>, private val iterator2: org.glavo.collection.Iterator<U>) : AbstractIterator<Pair<T, U>>(), IteratorView<Pair<T, U>> {
+    class TakeWhile<T>(private val iterator: Iterator<T>) : AbstractIterator<T>(), IteratorView<T> {
+        override fun next(): T {
+            TODO("not implemented")
+        }
+
+        override fun hasNext(): Boolean {
+            TODO("not implemented")
+        }
+
+    }
+
+    class Preappend
+
+    class Zip<T, U>(private val iterator1: KIterator<T>, private val iterator2: KIterator<U>) : AbstractIterator<Pair<T, U>>(), IteratorView<Pair<T, U>> {
 
         override fun hasNext(): Boolean {
             return iterator1.hasNext() && iterator2.hasNext()

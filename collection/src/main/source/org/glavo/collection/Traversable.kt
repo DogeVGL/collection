@@ -2,6 +2,7 @@
 
 package org.glavo.collection
 
+import org.glavo.collection.internal.CollectionUtils
 import org.glavo.collection.internal.TraversableAsJava
 import org.glavo.collection.internal.isNullPredicate
 import org.glavo.collection.mutable.ArrayBuffer
@@ -10,6 +11,7 @@ import org.glavo.collection.mutable.Growable
 import java.util.*
 import java.util.function.IntFunction
 import java.util.function.Predicate
+import kotlin.NoSuchElementException
 import kotlin.collections.ArrayList
 
 interface Traversable<out T> {
@@ -17,6 +19,15 @@ interface Traversable<out T> {
      * Returns an iterator over the elements of this object.
      */
     operator fun iterator(): Iterator<T>
+
+    @JvmDefault
+    fun elementAt(index: Int): T = iterator().elementAt(index)
+
+    @JvmDefault
+    fun elementAtOrNull(index: Int): T? = iterator().elementAtOrNull(index)
+
+    @JvmDefault
+    fun elementValueAtOrNull(index: Int): Value<T>? = iterator().elementValueAtOrNull(index)
 
     @JvmDefault
     fun size(): Int = iterator().size()
@@ -33,6 +44,16 @@ interface Traversable<out T> {
     @JvmDefault
     fun contains(value: Any?): Boolean =
             iterator().contains(value)
+
+    @JvmDefault
+    fun count(): Long = count(CollectionUtils.ALWAYS_TRUE)
+
+    @JvmDefault
+    fun count(predicate: Predicate<in T>): Long {
+        var i = 0L
+        forEach { i++ }
+        return i
+    }
 
     @JvmDefault
     fun <G : Growable<T>> filterTo(growable: G, predicate: Predicate<in T>): G {
@@ -56,6 +77,31 @@ interface Traversable<out T> {
     @JvmDefault
     fun filterNot(predicate: Predicate<in T>): Traversable<T> =
             filterNotTo(newTBuilder(), predicate).build()
+
+    @JvmDefault
+    fun first(): T = iterator().next()
+
+    @JvmDefault
+    fun firstOrNull(): T? = if (isEmpty()) null else first()
+
+    @JvmDefault
+    fun firstValueOrNull(): Value<T>? = if (isEmpty()) null else Value(first())
+
+    @JvmDefault
+    fun first(predicate: Predicate<in T>): T {
+        for (elem in this) {
+            if (predicate.test(elem)) {
+                return elem
+            }
+        }
+        throw NoSuchElementException()
+    }
+
+    @JvmDefault
+    fun firstOrNull(predicate: Predicate<in T>): T? = if (isEmpty()) null else first()
+
+    @JvmDefault
+    fun firstValueOrNull(predicate: Predicate<in T>): Value<T>? = if (isEmpty()) null else Value(first())
 
     @JvmDefault
     fun <A : Appendable> joinTo(buffer: A, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: ((T) -> CharSequence)? = null): A {
@@ -112,6 +158,18 @@ interface Traversable<out T> {
 
     @JvmDefault
     fun newTBuilder(): Builder<@UnsafeVariance T, Traversable<T>> = newBuilder()
+
+    @JvmDefault
+    infix fun sameElements(other: Traversable<*>): Boolean {
+        val it1 = this.iterator()
+        val it2 = other.iterator()
+        while (it1.hasNext() && it2.hasNext()) {
+            if (it1.next() != it2.next()) {
+                return false
+            }
+        }
+        return it1.hasNext() == it2.hasNext()
+    }
 
     @JvmDefault
     fun asJava(): Iterable<T> = TraversableAsJava(this)

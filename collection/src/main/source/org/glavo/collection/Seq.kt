@@ -10,6 +10,38 @@ interface Seq<out T> : Traversable<T> {
     operator fun get(index: Int): T
 
     @JvmDefault
+    fun getOrNull(index: Int): T? {
+        var idx = 0
+        for (elem in this) {
+            if (idx == index) {
+                return elem
+            }
+            idx++
+        }
+        return null
+    }
+
+    fun getValueOrNull(index: Int): Value<T>? {
+        var idx = 0
+        for (elem in this) {
+            if (idx == index) {
+                return Value(elem)
+            }
+            idx++
+        }
+        return null
+    }
+
+    @JvmDefault
+    override fun elementAt(index: Int): T = get(index)
+
+    @JvmDefault
+    override fun elementAtOrNull(index: Int): T? = getOrNull(index)
+
+    @JvmDefault
+    override fun elementValueAtOrNull(index: Int): Value<T>? = getValueOrNull(index)
+
+    @JvmDefault
     fun updated(index: Int, newValue: @UnsafeVariance T): Seq<T> {
         val b = newTBuilder()
         if (index >= this.size) {
